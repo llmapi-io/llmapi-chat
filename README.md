@@ -9,7 +9,7 @@
 
 [English](README.en.md)
 
-llmapi-chat 基于llmapi.io服务提供了简单的聊天服务器后端，可以直接和`ChatGPT``GPT-3``llama`等大模型聊天交互
+llmapi-chat 基于llmapi.io服务提供了简单的聊天服务器后端，可以直接和`ChatGPT` `GPT-3` `llama`等大模型聊天交互
 
 ## 安装和运行
 
