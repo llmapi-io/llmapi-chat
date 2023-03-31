@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { message as messageTip } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import { ClearOutlined, LoadingOutlined, RedoOutlined, SettingOutlined, GithubOutlined } from '@ant-design/icons-vue'
+import { SendOutlined, ClearOutlined, LoadingOutlined, RedoOutlined, SettingOutlined, GithubOutlined } from '@ant-design/icons-vue'
 import { chatstart, chatend, chatask} from '@/api'
 import Message from './components/message.vue'
 import SettingModal from './components/setting.vue'
@@ -15,12 +16,11 @@ const state = reactive({
   visible: false,
   session: '',
   session_ok: false,
+  inputHint:"会话无效，请先在右上角设置中配置API KEY和使用的模型"
 })
 const createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const messages = useMessages()
-
-const inputHint ="当前使用的模型是:"+setting.value.model+"，请输入消息，Enter换行 ..." 
 
 function updated(): void {
 	let chatBox= document.getElementById('chatlog');
@@ -40,9 +40,22 @@ const addmsg = () => {
   updated()
 }
 
+const msgfeed = async () => {
+    state.message += '\n'
+}
+
 const sendMessage = async (event: { preventDefault: () => void }) => {
-  event.preventDefault()
-  state.loadding = true
+ 	if(state.session_ok == false){
+		messageTip.warning("会话还未创建，请先在右上角设置中配置API KEY和使用的模型")
+  		return
+ 	}
+ 	if(state.loadding == true){
+		messageTip.warning("正在处理上一条消息，请勿重复发送")
+  		return
+ 	}
+
+  	event.preventDefault()
+  	state.loadding = true
 
   addmsg()
 
@@ -85,20 +98,26 @@ const endSession = async () => {
 }
 
 const handleToGithub = () => {
-  window.open('https://github.com/llmapi-io/')
+  window.open('https://github.com/llmapi-io/llmapi-chat')
 }
 
 onMounted(async () => {
-  await startSession()
+  	await startSession()
+	messageTip.config({                 
+  		getContainer: () => document.getElementById('msgtip')!,
+  		duration: 2,                      
+  		maxCount: 3,                      
+		});                                 
+	state.inputHint = state.session_ok ? ("正在与"+setting.value.model+"对话，Ctrl+Enter换行，Enter或点击按钮发送") : ("会话无效，请先在右上角设置中配置API KEY和使用的模型")
 })
-
 
 </script>
 
 <template>
   <div id="layout">
+    <setting-modal v-model:visible="state.visible" />
     <header id="header" class="bg-dark-50 text-white h-10 select-none">
-      <span class="text-size-5 pl-5">LLMApi</span>
+      <span class="text-size-5 pl-5 ">LLMApi</span>
       <a-tooltip>
         <template #title>清除聊天记录</template>
         <a-popconfirm title="确定清除本地所有聊天记录吗?" ok-text="确定" cancel-text="取消" @confirm="clearMessages">
@@ -112,12 +131,12 @@ onMounted(async () => {
       </a-tooltip>
       <LoadingOutlined v-if="state.loadding" class="pl-3 cursor-pointer" />
 
-	  <span class="float-right pr-3 pt-2">
-      <a-tooltip>
-        <template #title>设置</template>
-        <SettingOutlined class="pl-3 cursor-pointer" @click="state.visible = true" />
-      </a-tooltip>
-	  </span>
+      <span class="float-right pr-5 pt-2">
+      	<a-tooltip>
+          <template #title>设置</template>
+          <SettingOutlined class="pl-3 cursor-pointer" @click="state.visible = true" />
+        </a-tooltip>
+      </span>
 
     </header>
     <div id="layout-body">
@@ -148,19 +167,20 @@ onMounted(async () => {
           </div>
         </div>
       </main>
-
     </div>
+
+    <div id="msgtip" style="float:left background-color:#073069"></div>
+
     <footer id="footer">
       <div class="relative p-4 w-full overflow-hidden text-gray-600 focus-within:text-gray-400 flex items-center">
-        <a-textarea v-model:value="state.message" :auto-size="{ minRows: 3, maxRows: 5 }" :placeholder="inputHint" 
-          class="appearance-none pl-10 py-2 w-full bg-white border border-gray-300 rounded-full text-sm placeholder-gray-800 focus:outline-none focus:border-blue-500 focus:border-blue-500 focus:shadow-outline-blue" />
-        <span class="absolute inset-y-0 right-0 bottom-6 pr-6 flex items-end">
-          <a-button v-model:disabled="state.loadding" shape="round" type="primary" @click="sendMessage($event)">发送</a-button>
+        <a-textarea shape="round" v-model:value="state.message" :auto-size="{ minRows: 3, maxRows: 5 }" :placeholder="state.inputHint" @keydown.enter.prevent.exact="sendMessage($event)" @keydown.ctrl.enter="msgfeed()" class="appearance-none pl-10 py-2 w-full bg-white border border-gray-300 text-sm placeholder-gray-800 focus:outline-none focus:border-blue-500 focus:shadow-outline-blue" />
+        <span class="absolute inset-y-0 right-0 bottom-10 pr-6 flex items-end">
+          <a-button v-model:disabled="state.loadding" shape="round" type="primary" @click="sendMessage($event)"><SendOutlined class="pl-3 cursor-pointer" /></a-button>
+          
         </span>
       </div>
-
     </footer>
-    <setting-modal v-model:visible="state.visible" />
+
   </div>
 </template>
 
@@ -189,7 +209,7 @@ onMounted(async () => {
 #footer {
   border-top: 1px rgb(228, 228, 228) solid;
   width: 100%;
-  height: 100px;
+  height: auto;
   flex-shrink: 0;
 }
 

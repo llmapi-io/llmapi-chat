@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { message as messageTip } from 'ant-design-vue'
+import { message as messageTip} from 'ant-design-vue'
 import { Viewer } from '@bytemd/vue-next'
 import highlight from '@bytemd/plugin-highlight'
 import 'highlight.js/styles/atom-one-light.css'
@@ -17,12 +17,12 @@ defineProps<{
 
 const copyIt = (msg: string) => {
   copy(msg)
-  messageTip.success('Copied')
+  messageTip.success('复制成功')
 }
 
 const deleteIt = (meseage: TMessage) => {
   messages.messages.value = messages.messages.value.filter((item) => item !== meseage)
-  messageTip.success('Deleted')
+  messageTip.success('已删除')
 }
 </script>
 
