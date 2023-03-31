@@ -45,6 +45,10 @@ const msgfeed = async () => {
 }
 
 const sendMessage = async (event: { preventDefault: () => void }) => {
+ 	if(state.message == ""){
+		messageTip.warning("消息为空")
+  		return
+ 	}
  	if(state.session_ok == false){
 		messageTip.warning("会话还未创建，请先在右上角设置中配置API KEY和使用的模型")
   		return
@@ -105,7 +109,7 @@ onMounted(async () => {
   	await startSession()
 	messageTip.config({                 
   		getContainer: () => document.getElementById('msgtip')!,
-  		duration: 2,                      
+  		duration: 1,                      
   		maxCount: 3,                      
 		});                                 
 	state.inputHint = state.session_ok ? ("正在与"+setting.value.model+"对话，Ctrl+Enter换行，Enter或点击按钮发送") : ("会话无效，请先在右上角设置中配置API KEY和使用的模型")
@@ -204,6 +208,10 @@ onMounted(async () => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  scrollbar-width: none; /* Firefox */
+}
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
 }
 
 #footer {
