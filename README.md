@@ -17,7 +17,6 @@ llmapi-chat 基于llmapi.io服务提供了简单的聊天服务器后端，可�
 ``` shell
 ./build.sh
 ./start.sh
-# 访问 http://127.0.0.1:8081
 ```
 
 2. 使用docker运行
@@ -25,8 +24,17 @@ llmapi-chat 基于llmapi.io服务提供了简单的聊天服务器后端，可�
 ``` shell
 docker build -t llmapi-chat:0.1.0 .
 docker run --name webchat -d -p 8081:8081 llmapi-chat:0.1.0
-# 访问 http://127.0.0.1:8081
 ```
+
+## 访问
+
+> 在浏览器打开:`http://127.0.0.1:8081`即可访问webchat页面
+
+你可以在[llmapi.io](https://llmapi.io)上注册账号即可获得`apikey`，按照以下示例，完成配置后即可与`ChatGPT` `GPT-3`以及其他流行的LLM进行聊天:
+
+<p align="center">
+  <img src="demo/demo.png" alt="Chat demo">
+</p>
 
 ### 致谢
 本项目基于[chatGPT-web](https://github.com/mic1on/chatGPT-web)开发
