@@ -2,7 +2,7 @@
 import { message as messageTip} from 'ant-design-vue'
 import { Viewer } from '@bytemd/vue-next'
 import highlight from '@bytemd/plugin-highlight'
-import 'highlight.js/styles/atom-one-light.css'
+import 'highlight.js/styles/github-dark.css'
 import useMessages from '@/composables/messages'
 import { CopyOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { useClipboard } from '@vueuse/core'

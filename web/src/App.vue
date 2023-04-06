@@ -16,9 +16,8 @@ const state = reactive({
   visible: false,
   session: '',
   session_ok: false,
-  inputHint:"会话无效，请先在右上角设置中配置API KEY和使用的模型"
+  inputHint:"当前会话无效，请先在右上角的设置中配置API KEY和使用的模型"
 })
-const createdAt = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const messages = useMessages()
 
@@ -46,11 +45,11 @@ const msgfeed = async () => {
 
 const sendMessage = async (event: { preventDefault: () => void }) => {
  	if(state.message == ""){
-		messageTip.warning("消息为空")
+		messageTip.warning("消息不可以为空")
   		return
  	}
  	if(state.session_ok == false){
-		messageTip.warning("会话还未创建，请先在右上角设置中配置API KEY和使用的模型")
+		messageTip.warning("会话还未成功创建，请先在右上角设置中配置API KEY和使用的模型")
   		return
  	}
  	if(state.loadding == true){
@@ -61,26 +60,30 @@ const sendMessage = async (event: { preventDefault: () => void }) => {
   	event.preventDefault()
   	state.loadding = true
 
-  addmsg()
+	var pre_hint = state.inputHint
+	state.inputHint = "正在努力处理您的问题，请耐心等待 ..."
 
-  let question = ""
-  question = state.message
-  state.message = ""
-  const data:any = await chatask(question, state.session)
- var replyMessage = data?.reply ? (data.reply) : data?.msg
-  if (setting.value.model == "dall-e"){
-	replyMessage = '<img width="256px" src="' + replyMessage +'"></img>'
-}
-  var n = dayjs().format('YYYY-MM-DD HH:mm:ss')
-  messages.addMessage({
-    username: setting.value.model,
-    msg: replyMessage,
-	time: n,
-    type: 0,
-  })
-  await new Promise(f => setTimeout(f, 1000));
-  updated()
-  state.loadding = false
+  	addmsg()
+
+  	let question = ""
+  	question = state.message
+  	state.message = ""
+  	const data:any = await chatask(question, state.session)
+ 	var replyMessage = data?.reply ? (data.reply) : data?.msg
+  	if (setting.value.model == "dall-e"){
+		replyMessage = '<img width="256px" src="' + replyMessage +'"></img>'
+	}
+  	var n = dayjs().format('YYYY-MM-DD HH:mm:ss')
+  	messages.addMessage({
+    		username: setting.value.model,
+    		msg: replyMessage,
+		time: n,
+    		type: 0,
+  	})
+  	await new Promise(f => setTimeout(f, 1000));
+  	updated()
+  	state.inputHint = pre_hint
+  	state.loadding = false
 }
 
 const clearMessages = () => {
@@ -112,7 +115,7 @@ onMounted(async () => {
   	await startSession()
 	messageTip.config({                 
   		getContainer: () => document.getElementById('msgtip')!,
-  		duration: 1,                      
+  		duration: 2,                      
   		maxCount: 3,                      
 		});                                 
 	state.inputHint = state.session_ok ? ("正在与"+setting.value.model+"对话，Ctrl+Enter换行，Enter或点击按钮发送") : ("会话无效，请先在右上角设置中配置API KEY和使用的模型")
@@ -123,12 +126,12 @@ onMounted(async () => {
 <template>
   <div id="layout">
     <setting-modal v-model:visible="state.visible" />
-    <header id="header" class="bg-dark-50 text-white h-10 select-none">
-      <span class="text-size-5 pl-5 ">LLMApi</span>
+    <header id="header" style="background-color:#220730; height:2.2rem" class="text-white select-none">
+      <span class="text-size-5 pl-5 "><a href="https://llmapi.io" target="_blank" style="color:white" >LLMApi</a></span>
       <a-tooltip>
         <template #title>清除聊天记录</template>
         <a-popconfirm title="确定清除本地所有聊天记录吗?" ok-text="确定" cancel-text="取消" @confirm="clearMessages">
-          <ClearOutlined class="pl-3 cursor-pointer" />
+          <ClearOutlined class="pl-4 cursor-pointer" />
         </a-popconfirm>
       </a-tooltip>
 
@@ -138,7 +141,7 @@ onMounted(async () => {
       </a-tooltip>
       <LoadingOutlined v-if="state.loadding" class="pl-3 cursor-pointer" />
 
-      <span class="float-right pr-5 pt-2">
+      <span class="float-right pr-5" style="padding-top:0.4rem">
       	<a-tooltip>
           <template #title>设置</template>
           <SettingOutlined class="pl-3 cursor-pointer" @click="state.visible = true" />
@@ -155,15 +158,6 @@ onMounted(async () => {
             <!-- dialog -->
             <div class="flex-1 w-full self-center">
               <div class="relative px-3 py-1 m-auto flex flex-col">
-                <div class="mx-0 my-1 self-center text-xs text-gray-400">
-                  {{ createdAt }}
-                </div>
-                <div v-if='state.session_ok' class="mx-0 my-1 self-center text-xs text-gray-400">
-                  当前使用的模型是:{{ setting.model }}
-		</div>
-                <div v-else class="mx-0 my-1 self-center text-xs text-gray-400">
-                  会话还未创建，请先在右上角设置中配置API KEY和使用的模型
-		</div>
                 <Message :message=msg v-for="msg in messages.messages.value"
                   :class="msg.type === 1 ? 'send' : 'replay'" />
       		<div v-if='state.loadding'>
@@ -182,7 +176,7 @@ onMounted(async () => {
       <div class="relative p-4 w-full overflow-hidden text-gray-600 focus-within:text-gray-400 flex items-center">
         <a-textarea shape="round" v-model:value="state.message" :auto-size="{ minRows: 3, maxRows: 5 }" :placeholder="state.inputHint" @keydown.enter.prevent.exact="sendMessage($event)" @keydown.ctrl.enter="msgfeed()" class="appearance-none pl-10 py-2 w-full bg-white border border-gray-300 text-sm placeholder-gray-800 focus:outline-none focus:border-blue-500 focus:shadow-outline-blue" />
         <span class="absolute inset-y-0 right-0 bottom-10 pr-6 flex items-end">
-          <a-button v-model:disabled="state.loadding" shape="round" type="primary" @click="sendMessage($event)"><SendOutlined class="pl-3 cursor-pointer" /></a-button>
+          <a-button v-model:disabled="state.loadding" shape="round" type="primary" @click="sendMessage($event)"><SendOutlined v-if="state.loadding==false" class="pl-3 cursor-pointer" /><LoadingOutlined v-if="state.loadding" class="pl-3 cursor-pointer" /></a-button>
           
         </span>
       </div>
@@ -218,7 +212,6 @@ onMounted(async () => {
 }
 
 #footer {
-  border-top: 1px rgb(228, 228, 228) solid;
   width: 100%;
   height: auto;
   flex-shrink: 0;

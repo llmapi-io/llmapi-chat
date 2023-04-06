@@ -21,6 +21,7 @@ templates = Jinja2Templates(directory=DIST_DIR)
 class MessageStart(BaseModel):
     apikey:str
     bot_type:str
+    setting:dict = None
 
 class MessageEnd(BaseModel):
     apikey:str

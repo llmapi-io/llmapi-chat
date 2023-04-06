@@ -33,13 +33,17 @@ const handleOk = () => {
       </template>
 
       <a-form :model="setting">
-        <a-form-item label="API KEY">
-          <a-input v-model:value="setting.app_key" placeholder="apikey for llmapi.io" />
+        <a-form-item label="api key">
+          <a-input v-model:value="setting.api_key" placeholder="Register on https://llmapi.io to get the api key" />
         </a-form-item>
-        <a-form-item label="对话模型">
+        <a-form-item label="bot">
           <a-select ref="select" v-model:value="setting.model" style="width: 180px">
             <a-select-option :value="model" v-for="model in models">{{ model }}</a-select-option>
           </a-select>
+        </a-form-item>
+
+	<a-form-item v-if="setting.model=='chatgpt'" label="system">
+          <a-input v-model:value="setting.system" placeholder="default:You are a helpful assistant" />
         </a-form-item>
       </a-form>
 

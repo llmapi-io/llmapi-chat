@@ -2,6 +2,7 @@ import httpx
 
 async def llmapi_chat_start(message):
     url = "https://api.llmapi.io/v1/chat/start"
+    print(message)
     async with httpx.AsyncClient() as client:
         response = await client.post(
             url,
