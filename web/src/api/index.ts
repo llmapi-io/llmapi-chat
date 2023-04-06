@@ -13,7 +13,7 @@ export const chatstart= async () => {
     data: {
       apikey: setting.value.api_key,
       bot_type: setting.value.model,
-      setting:{system:sys}
+      settings:{system:sys}
     }
   })
   return res
