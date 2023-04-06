@@ -35,7 +35,7 @@ const deleteIt = (meseage: TMessage) => {
     </div>
   </div>
   <div class="my-2 self-start flex items-center" v-else>
-    <div class="p-1 rounded-t-lg rounded-r-lg bg-gray-100 text-black shadow text-sm min-w-10">
+    <div class="p-1 rounded-t-lg rounded-r-lg bg-gray-200 text-black shadow text-sm min-w-10">
       <!-- <pre class="max-w-80 !mb-0">{{ message.msg }}</pre> -->
       <Viewer class="max-w-120 m-2" :value="message.msg" :plugins="[highlight()]" />
     </div>
