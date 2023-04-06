@@ -67,7 +67,10 @@ const sendMessage = async (event: { preventDefault: () => void }) => {
   question = state.message
   state.message = ""
   const data:any = await chatask(question, state.session)
-  const replyMessage = data?.reply ? (data.reply) : data?.msg
+ var replyMessage = data?.reply ? (data.reply) : data?.msg
+  if (setting.value.model == "dall-e"){
+	replyMessage = '<img width="256px" src="' + replyMessage +'"></img>'
+}
   var n = dayjs().format('YYYY-MM-DD HH:mm:ss')
   messages.addMessage({
     username: setting.value.model,

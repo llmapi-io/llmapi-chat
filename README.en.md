@@ -8,6 +8,14 @@
 
 llmapi-chat is a simple `web-chat-server` backend that can chat with a variety of large language models (LLM, such as ChatGPT, GPT-3, GPT-4, etc.)
 
+## Supportted ability
+
+- Continuous Dialogue: Use `ChatGPT` for multiple rounds of continuous dialogue
+- Text completion: use `GPT-3` or `welm` model for text completion
+- Text embedding: use openai's `Embedding` model to convert sentences into vectors, which can be used for classification, search and other tasks
+- Text to image: use `dall-e` model to convert text to image
+- Real-time search: Use `NewBing` interface to experience Bing search (based on ChatGPT, unofficial interface)
+
 ## Install & Run
 
 1. build and run locally
